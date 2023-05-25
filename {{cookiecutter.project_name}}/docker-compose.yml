@@ -1,0 +1,96 @@
+version: "3.7"
+
+services:
+  # This service runs the postgres DB used by dagster for run storage, schedule storage,
+  # and event log storage.
+  {{cookiecutter.project_name}}_postgresql:
+    image: postgres:11
+    container_name: {{cookiecutter.project_name}}_postgresql
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - {{cookiecutter.project_name}}_network
+
+  # This service runs the gRPC server that loads and executes your user code, in both dagit
+  # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
+  # run launcher to use this same image when launching runs in a new container as well.
+  # Multiple containers like this can be deployed separately - each just needs to run on
+  # its own port, and have its own entry in the workspace.yaml file that's loaded by dagit.
+  {{cookiecutter.project_name}}_user_code:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_user_code
+    container_name: {{cookiecutter.project_name}}_user_code
+    image: {{cookiecutter.project_name}}_user_code
+    restart: unless-stopped
+    environment:
+      DAGSTER_POSTGRES_USER: ${POSTGRES_USER}
+      DAGSTER_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DAGSTER_POSTGRES_DB: ${POSTGRES_DB}
+      DAGSTER_CURRENT_IMAGE: "{{cookiecutter.project_name}}_user_code"
+    networks:
+      - {{cookiecutter.project_name}}_network
+
+  # This service runs dagit, which loads the user code from the user code container.
+  # Since our instance uses the QueuedRunCoordinator, any runs submitted from dagit will be put on
+  # a queue and later dequeued and launched by dagster-daemon.
+  {{cookiecutter.project_name}}_dagit:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_dagster
+    entrypoint:
+      - dagit
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    container_name: {{cookiecutter.project_name}}_dagit
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_POSTGRES_USER: ${POSTGRES_USER}
+      DAGSTER_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DAGSTER_POSTGRES_DB: ${POSTGRES_DB}
+    volumes: # Make docker client accessible so we can terminate containers from dagit
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+    networks:
+      - {{cookiecutter.project_name}}_network
+    depends_on:
+      - {{cookiecutter.project_name}}_postgresql
+      - {{cookiecutter.project_name}}_user_code
+
+  # This service runs the dagster-daemon process, which is responsible for taking runs
+  # off of the queue and launching them, as well as creating runs from schedules or sensors.
+  {{cookiecutter.project_name}}_daemon:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_dagster
+    entrypoint:
+      - dagster-daemon
+      - run
+    container_name: {{cookiecutter.project_name}}_daemon
+    restart: on-failure
+    environment:
+      DAGSTER_POSTGRES_USER: ${POSTGRES_USER}
+      DAGSTER_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DAGSTER_POSTGRES_DB: ${POSTGRES_DB}
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+    networks:
+      - {{cookiecutter.project_name}}_network
+    depends_on:
+      - {{cookiecutter.project_name}}_postgresql
+      - {{cookiecutter.project_name}}_user_code
+
+networks:
+  {{cookiecutter.project_name}}_network:
+    driver: bridge
+    name: {{cookiecutter.project_name}}_network
