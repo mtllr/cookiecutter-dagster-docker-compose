@@ -21,7 +21,7 @@ services:
   {{cookiecutter.project_name}}_user_code:
     build:
       context: .
-      dockerfile: ./Dockerfile_user_code
+      dockerfile: ./Dockerfile_user_code/Dockerfile_user_code
     container_name: {{cookiecutter.project_name}}_user_code
     image: {{cookiecutter.project_name}}_user_code
     restart: unless-stopped
@@ -39,7 +39,7 @@ services:
   {{cookiecutter.project_name}}_dagit:
     build:
       context: .
-      dockerfile: ./Dockerfile_dagster
+      dockerfile: ./Dockerfile_dagster/Dockerfile_dagster
     entrypoint:
       - dagit
       - -h
@@ -71,7 +71,7 @@ services:
   {{cookiecutter.project_name}}_daemon:
     build:
       context: .
-      dockerfile: ./Dockerfile_dagster
+      dockerfile: ./Dockerfile_dagster/Dockerfile_dagster
     entrypoint:
       - dagster-daemon
       - run
