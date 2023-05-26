@@ -5,19 +5,13 @@ FROM python:3.7-slim
 # Checkout and install dagster libraries needed to run the gRPC server
 # exposing your repository to dagit and dagster-daemon, and to load the DagsterInstance
 
-# WORKDIR /tmp
-
-RUN mkdir /tmp/reqs
-
-COPY requirements.txt /tmp/reqs
-
-RUN pip install -r /tmp/reqs/requirements.txt
-
 # Add repository code
 
 WORKDIR /opt/dagster/app
 
-COPY ../{{cookiecutter.project_name}}/* /opt/dagster/app
+COPY ../Dockerfile_user_code /opt/dagster/app
+
+RUN pip install -r /opt/dagster/app/requirements.txt
 
 # Run dagster gRPC server on port 4000
 
