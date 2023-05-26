@@ -8,6 +8,6 @@ ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 
 WORKDIR $DAGSTER_HOME
 
-COPY dagster.yaml workspace.yaml requirements.txt $DAGSTER_HOME
+COPY ../Dockerfile_dagster/dagster.yaml ../Dockerfile_dagster/workspace.yaml ../Dockerfile_dagster/requirements.txt $DAGSTER_HOME
 
 RUN pip install -r $DAGSTER_HOME/requirements.txt
