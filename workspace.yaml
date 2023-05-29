@@ -1,5 +1,5 @@
 load_from:
-  # Each entry here corresponds to a service in the docker-compose file that exposes pipelines.
+  # Each entry here corresponds to a service in the docker-compose file that exposes user code.
   - grpc_server:
       host: docker_example_user_code
       port: 4000

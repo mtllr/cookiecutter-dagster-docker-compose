@@ -1,6 +1,4 @@
-import time
-
-from dagster import FilesystemIOManager, graph, job, op, repository, schedule
+from dagster import FilesystemIOManager, graph, op, repository, schedule
 from dagster_docker import docker_executor
 
 
@@ -11,18 +9,9 @@ def hello():
 
 @op
 def goodbye(foo):
+    if foo != 1:
+        raise Exception("Bad io manager")
     return foo * 2
-
-
-@op
-def hanging_op():
-    while True:
-        time.sleep(5)
-
-
-@job
-def hanging_job():
-    hanging_op()
 
 
 @graph
@@ -31,6 +20,7 @@ def my_graph():
 
 
 my_job = my_graph.to_job(name="my_job")
+
 my_step_isolated_job = my_graph.to_job(
     name="my_step_isolated_job",
     executor_def=docker_executor,
@@ -45,4 +35,4 @@ def my_schedule(_context):
 
 @repository
 def deploy_docker_repository():
-    return [my_job, hanging_job, my_schedule, my_step_isolated_job]
+    return [my_job, my_step_isolated_job, my_schedule]

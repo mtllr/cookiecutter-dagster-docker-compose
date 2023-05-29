@@ -3,16 +3,12 @@
 
 FROM python:3.7-slim
 
-COPY ./python_modules/ /tmp/python_modules/
-
-WORKDIR /tmp
-
 RUN pip install \
-    -e python_modules/dagster \
-    -e python_modules/dagster-graphql \
-    -e python_modules/dagit \
-    -e python_modules/libraries/dagster-postgres \
-    -e python_modules/libraries/dagster-docker
+    dagster \
+    dagster-graphql \
+    dagit \
+    dagster-postgres \
+    dagster-docker
 
 # Set $DAGSTER_HOME and copy dagster instance and workspace YAML there
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/

@@ -1,7 +1,5 @@
 version: "3.7"
 
-# Build these services with ./build.sh to access the dagster/dagit code from master
-
 services:
   # This service runs the postgres DB used by dagster for run storage, schedule storage,
   # and event log storage.
@@ -15,7 +13,7 @@ services:
     networks:
       - docker_example_network
 
-  # This service runs the gRPC server that loads and executes your user code, in both dagit
+  # This service runs the gRPC server that loads your user code, in both dagit
   # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
   # run launcher to use this same image when launching runs in a new container as well.
   # Multiple containers like this can be deployed separately - each just needs to run on
@@ -35,7 +33,7 @@ services:
     networks:
       - docker_example_network
 
-  # This service runs dagit, which loads the user code from the user code container.
+  # This service runs dagit, which loads your user code from the user code container.
   # Since our instance uses the QueuedRunCoordinator, any runs submitted from dagit will be put on
   # a queue and later dequeued and launched by dagster-daemon.
   docker_example_dagit:
