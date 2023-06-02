@@ -7,9 +7,9 @@ services:
     image: postgres:11
     container_name: docker_example_postgresql
     environment:
-      POSTGRES_USER: "postgres_user"
-      POSTGRES_PASSWORD: "postgres_password"
-      POSTGRES_DB: "postgres_db"
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
     networks:
       - docker_example_network
 
@@ -19,17 +19,15 @@ services:
   # Multiple containers like this can be deployed separately - each just needs to run on
   # its own port, and have its own entry in the workspace.yaml file that's loaded by dagit.
   docker_example_user_code:
-    build:
-      context: .
-      dockerfile: ./Dockerfile_user_code
+    build: docker_user_code
     container_name: docker_example_user_code
     image: docker_example_user_code_image
     restart: always
     environment:
-      DAGSTER_POSTGRES_USER: "postgres_user"
-      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
-      DAGSTER_POSTGRES_DB: "postgres_db"
-      DAGSTER_CURRENT_IMAGE: "docker_example_user_code_image"
+      DAGSTER_POSTGRES_USER: $POSTGRES_USER
+      DAGSTER_POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      DAGSTER_POSTGRES_DB: $POSTGRES_DB
+      DAGSTER_CURRENT_IMAGE: $DAGSTER_CURRENT_IMAGE
     networks:
       - docker_example_network
 
@@ -37,9 +35,7 @@ services:
   # Since our instance uses the QueuedRunCoordinator, any runs submitted from dagit will be put on
   # a queue and later dequeued and launched by dagster-daemon.
   docker_example_dagit:
-    build:
-      context: .
-      dockerfile: ./Dockerfile_dagster
+    build: docker_dagster
     entrypoint:
       - dagit
       - -h
@@ -54,10 +50,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DAGSTER_POSTGRES_USER: "postgres_user"
-      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
-      DAGSTER_POSTGRES_DB: "postgres_db"
-    volumes: # Make docker client accessible so we can terminate containers from dagit
+      DAGSTER_POSTGRES_USER: $POSTGRES_USER
+      DAGSTER_POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      DAGSTER_POSTGRES_DB: $POSTGRES_DB
+    volumes:
+      # Make docker client accessible so we can terminate containers from dagit
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
     networks:
@@ -69,19 +66,18 @@ services:
   # This service runs the dagster-daemon process, which is responsible for taking runs
   # off of the queue and launching them, as well as creating runs from schedules or sensors.
   docker_example_daemon:
-    build:
-      context: .
-      dockerfile: ./Dockerfile_dagster
+    build: docker_dagster
     entrypoint:
       - dagster-daemon
       - run
     container_name: docker_example_daemon
     restart: on-failure
     environment:
-      DAGSTER_POSTGRES_USER: "postgres_user"
-      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
-      DAGSTER_POSTGRES_DB: "postgres_db"
-    volumes: # Make docker client accessible so we can launch containers using host docker
+      DAGSTER_POSTGRES_USER: $POSTGRES_USER
+      DAGSTER_POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      DAGSTER_POSTGRES_DB: $POSTGRES_DB
+    volumes:
+      # Make docker client accessible so we can launch containers using host docker
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
     networks:

@@ -121,7 +121,7 @@ mutation($runId: String!) {
 
 
 def test_deploy_docker():
-    with docker_service_up(file_relative_path(__file__, "../from_source/docker-compose.yml")):
+    with docker_service_up(file_relative_path(__file__, "../docker-compose.yml")):
         # Wait for server to wake up
 
         start_time = time.time()

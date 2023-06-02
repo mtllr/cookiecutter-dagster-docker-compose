@@ -3,9 +3,6 @@
 
 python_modules/libraries
 
-### dotenv ###
-# .env
-
 ### macOS ###
 # General
 .DS_Store

@@ -1,4 +1,4 @@
-# {{cookiecutter.project_name}}
+# {{cookiecutter.project_slug}}
 
 This is a [Dagster](https://dagster.io/) project scaffolded with [`dagster project scaffold`](https://docs.dagster.io/getting-started/create-new-project) and augmented with cookiecutter.
 
@@ -18,7 +18,7 @@ docker-compose up
 
 Open http://localhost:3000 with your browser to see the project.
 
-You can start writing assets in `{{cookiecutter.project_name}}/assets.py`. The assets are automatically loaded into the Dagster code location as you define them.
+You can start writing assets in `{{cookiecutter.project_slug}}/assets.py`. The assets are automatically loaded into the Dagster code location as you define them.
 
 ## Development
 
@@ -29,10 +29,10 @@ You can specify new Python dependencies in `setup.py`. Then rebuild the image: `
 
 ### Unit testing
 
-Tests are in the `{{cookiecutter.project_name}}_tests` directory and you can run tests using `pytest`:
+Tests are in the `{{cookiecutter.project_slug}}_tests` directory and you can run tests using `pytest`:
 
 ```bash
-pytest {{cookiecutter.project_name}}_tests
+pytest {{cookiecutter.project_slug}}_tests
 ```
 
 ### Schedules and sensors
