@@ -3,12 +3,11 @@
 
 FROM python:3.11-slim as base
 
-RUN pip install \
-    dagster \
-    dagster-graphql \
-    dagster-webserver \
-    dagster-postgres \
-    dagster-docker
+WORKDIR /opt/dagster
+
+# Copy the requirements file and install Python dependencies
+COPY ./requirements/dagster.txt /opt/dagster/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Set $DAGSTER_HOME and copy dagster instance and workspace YAML there
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
