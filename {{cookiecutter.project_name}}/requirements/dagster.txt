@@ -1,5 +1,5 @@
 dagster
 dagster-graphql
-dagit
+dagster-webserver
 dagster-postgres
 dagster-docker

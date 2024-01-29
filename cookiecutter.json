@@ -1,3 +1,5 @@
 {
-    "project_name": "my-awesome-project"
+    "project_name": "my-awesome-dagster-project",
+    "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
+    "keep_local_envs_in_vcs": "y"
 }

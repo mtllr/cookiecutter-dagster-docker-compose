@@ -11,12 +11,11 @@ run_launcher:
   class: DockerRunLauncher
   config:
     env_vars:
-      - DAGSTER_POSTGRES_USER
-      - DAGSTER_POSTGRES_PASSWORD
-      - DAGSTER_POSTGRES_DB
-    network: {{cookiecutter.project_name}}_network
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    network: {{cookiecutter.project_slug}}_network
     container_kwargs:
-      auto_remove: true
       volumes: # Make docker client accessible to any launched containers as well
         - /var/run/docker.sock:/var/run/docker.sock
         - /tmp/io_manager_storage:/tmp/io_manager_storage
@@ -26,13 +25,13 @@ run_storage:
   class: PostgresRunStorage
   config:
     postgres_db:
-      hostname: {{cookiecutter.project_name}}_postgresql
+      hostname: {{cookiecutter.project_slug}}_postgres
       username:
-        env: DAGSTER_POSTGRES_USER
+        env: POSTGRES_USER
       password:
-        env: DAGSTER_POSTGRES_PASSWORD
+        env: POSTGRES_PASSWORD
       db_name:
-        env: DAGSTER_POSTGRES_DB
+        env: POSTGRES_DB
       port: 5432
 
 schedule_storage:
@@ -40,13 +39,13 @@ schedule_storage:
   class: PostgresScheduleStorage
   config:
     postgres_db:
-      hostname: {{cookiecutter.project_name}}_postgresql
+      hostname: {{cookiecutter.project_slug}}_postgres
       username:
-        env: DAGSTER_POSTGRES_USER
+        env: POSTGRES_USER
       password:
-        env: DAGSTER_POSTGRES_PASSWORD
+        env: POSTGRES_PASSWORD
       db_name:
-        env: DAGSTER_POSTGRES_DB
+        env: POSTGRES_DB
       port: 5432
 
 event_log_storage:
@@ -54,11 +53,11 @@ event_log_storage:
   class: PostgresEventLogStorage
   config:
     postgres_db:
-      hostname: {{cookiecutter.project_name}}_postgresql
+      hostname: {{cookiecutter.project_slug}}_postgres
       username:
-        env: DAGSTER_POSTGRES_USER
+        env: POSTGRES_USER
       password:
-        env: DAGSTER_POSTGRES_PASSWORD
+        env: POSTGRES_PASSWORD
       db_name:
-        env: DAGSTER_POSTGRES_DB
+        env: POSTGRES_DB
       port: 5432
