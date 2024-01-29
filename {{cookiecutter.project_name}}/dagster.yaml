@@ -11,10 +11,12 @@ run_launcher:
   class: DockerRunLauncher
   config:
     env_vars:
+      - POSTGRES_HOST
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
-    network: {{cookiecutter.project_slug}}_network
+    network: 
+      env: DOCKER_NETWORK
     container_kwargs:
       volumes: # Make docker client accessible to any launched containers as well
         - /var/run/docker.sock:/var/run/docker.sock
@@ -25,7 +27,8 @@ run_storage:
   class: PostgresRunStorage
   config:
     postgres_db:
-      hostname: {{cookiecutter.project_slug}}_postgres
+      hostname: 
+        env: POSTGRES_HOST
       username:
         env: POSTGRES_USER
       password:
@@ -39,7 +42,8 @@ schedule_storage:
   class: PostgresScheduleStorage
   config:
     postgres_db:
-      hostname: {{cookiecutter.project_slug}}_postgres
+      hostname: 
+        env: POSTGRES_HOST
       username:
         env: POSTGRES_USER
       password:
@@ -53,7 +57,8 @@ event_log_storage:
   class: PostgresEventLogStorage
   config:
     postgres_db:
-      hostname: {{cookiecutter.project_slug}}_postgres
+      hostname: 
+        env: POSTGRES_HOST
       username:
         env: POSTGRES_USER
       password:

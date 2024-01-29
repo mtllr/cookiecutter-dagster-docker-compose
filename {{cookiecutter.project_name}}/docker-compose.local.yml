@@ -1,20 +1,20 @@
 version: "3.7"
 volumes:
-  {{cookiecutter.project_slug}}_postgres_data: {}
-  {{cookiecutter.project_slug}}_postgres_data_backups: {}
+  {{cookiecutter.project_slug}}_local_postgres_data: {}
+  {{cookiecutter.project_slug}}_local_postgres_data_backups: {}
 services:
   # This service runs the postgres DB used by dagster for run storage, schedule storage,
   # and event log storage.
-  {{cookiecutter.project_slug}}_postgres:
+  {{cookiecutter.project_slug}}_local_postgres:
     image: postgres:15
-    container_name: {{cookiecutter.project_slug}}_postgres
+    container_name: {{cookiecutter.project_slug}}_local_postgres
     env_file:
-      - ./.envs/.production
+      - ./.envs/.local
     volumes:
-      - {{cookiecutter.project_slug}}_postgres_data:/var/lib/postgresql/data
-      - {{cookiecutter.project_slug}}_postgres_data_backups:/backups
+      - {{cookiecutter.project_slug}}_local_postgres_data:/var/lib/postgresql/data
+      - {{cookiecutter.project_slug}}_local_postgres_data_backups:/backups
     networks:
-      - {{cookiecutter.project_slug}}_network
+      - {{cookiecutter.project_slug}}_local_network
 
   # This service runs the gRPC server that loads your user code, in both dagster-webserver
   # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
@@ -22,30 +22,45 @@ services:
   # Multiple containers like this can be deployed separately - each just needs to run on
   # its own port, and have its own entry in the workspace.yaml file that's loaded by the
   # webserver.
-  {{cookiecutter.project_slug}}_user_code:
+  {{cookiecutter.project_slug}}_local_user_code:
     build:
       context: .
       dockerfile: ./docker/user_code.Dockerfile
-    container_name: {{cookiecutter.project_slug}}_user_code
-    image: {{cookiecutter.project_slug}}_user_code_image
+    container_name: {{cookiecutter.project_slug}}_local_user_code
+    image: {{cookiecutter.project_slug}}_local_user_code_image
     restart: always
     env_file:
-      - ./.envs/.production
+      - ./.envs/.local
     environment:
-      DAGSTER_CURRENT_IMAGE: "{{cookiecutter.project_slug}}_user_code_image"
+      DAGSTER_CURRENT_IMAGE: "{{cookiecutter.project_slug}}_local_user_code_image"
     volumes:
+      # Mount your code into the container so that we can reload it without rebuilding the image in development
       - ./{{cookiecutter.project_slug}}:/opt/dagster/app:z
     networks:
-      - {{cookiecutter.project_slug}}_network
+      - {{cookiecutter.project_slug}}_local_network
+    # We override the entrypoint here to run the dagster code-server instead of the the gRPC server specified in the
+    # production user_code.Dockerfile `CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-m", "app"]`
+    entrypoint:
+      [
+        "dagster",
+        "code-server",
+        "start",
+        "-h",
+        "0.0.0.0",
+        "-p",
+        "4000",
+        "-m",
+        "app"
+      ]
 
   # This service runs dagster-webserver, which loads your user code from the user code container.
   # Since our instance uses the QueuedRunCoordinator, any runs submitted from the webserver will be put on
   # a queue and later dequeued and launched by dagster-daemon.
-  {{cookiecutter.project_slug}}_webserver: &dagster
+  {{cookiecutter.project_slug}}_local_webserver: &dagster
     build:
       context: .
       dockerfile: ./docker/dagster.Dockerfile
-      target: production
+      target: local
     entrypoint:
       - dagster-webserver
       - -h
@@ -54,36 +69,36 @@ services:
       - "3000"
       - -w
       - workspace.yaml
-    container_name: {{cookiecutter.project_slug}}_webserver
+    container_name: {{cookiecutter.project_slug}}_local_webserver
     expose:
       - "3000"
     ports:
       - "3000:3000"
     env_file:
-      - ./.envs/.production
+      - ./.envs/.local
     volumes: # Make docker client accessible so we can terminate containers from the webserver
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
     networks:
-      - {{cookiecutter.project_slug}}_network
+      - {{cookiecutter.project_slug}}_local_network
     depends_on:
-      - {{cookiecutter.project_slug}}_postgres
-      - {{cookiecutter.project_slug}}_user_code
+      - {{cookiecutter.project_slug}}_local_postgres
+      - {{cookiecutter.project_slug}}_local_user_code
 
   # This service runs the dagster-daemon process, which is responsible for taking runs
   # off of the queue and launching them, as well as creating runs from schedules or sensors.
-  {{cookiecutter.project_slug}}_daemon:
+  {{cookiecutter.project_slug}}_local_daemon:
     <<: *dagster
     entrypoint:
       - dagster-daemon
       - run
     expose: []
     ports: []
-    container_name: {{cookiecutter.project_slug}}_daemon
+    container_name: {{cookiecutter.project_slug}}_local_daemon
     restart: on-failure
 
 
 networks:
-  {{cookiecutter.project_slug}}_network:
+  {{cookiecutter.project_slug}}_local_network:
     driver: bridge
-    name: {{cookiecutter.project_slug}}_network
+    name: {{cookiecutter.project_slug}}_local_network

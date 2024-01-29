@@ -1,15 +1,10 @@
 {
+    "files.autoSave": "onFocusChange",
+    "files.autoSaveDelay": 1000,
     "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
-        },
+        "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "isort.args": [
-        "--profile",
-        "black"
-    ],
-    "editor.formatOnSave": true,
-    "files.autoSave": "afterDelay",
+    "python.formatting.provider": "none",
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
