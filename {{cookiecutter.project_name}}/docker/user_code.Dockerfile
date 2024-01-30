@@ -7,7 +7,7 @@ COPY ./requirements/user_code.txt /opt/dagster/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the repository code
-COPY ./{{cookiecutter.project_name}} /opt/dagster/app
+COPY ./{{cookiecutter.project_slug}} /opt/dagster/app
 
 # Run dagster gRPC server on port 4000
 EXPOSE 4000
