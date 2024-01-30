@@ -1,6 +1,43 @@
+# [build-system]
+# requires = ["setuptools"]
+# build-backend = "setuptools.build_meta"
+
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.dagster]
 module_name = "{{cookiecutter.project_name}}"
+
+[tool.poetry]
+name = "{{cookiecutter.project_name}}"
+version = "0.1.0"
+description = ""
+authors = ["{{cookiecutter.author_name}}"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pytest = "^8.0.0"
+
+[tool.poetry.group.dagster-min]
+optional = true
+[tool.poetry.group.dagster-min.dependencies]
+dagster = "^1.6.2"
+dagster-docker = "^0.22.2"
+
+[tool.poetry.group.dagster-full]
+optional = true
+[tool.poetry.group.dagster-full.dependencies]
+dagster-webserver = "^1.6.2"
+dagster-graphql = "^1.6.2"
+dagster-postgres = "^0.22.2"
+
+[tool.poetry.group.lint]
+optional = true
+[tool.poetry.group.lint.dependencies]
+black = "^24.1.1"
+pylint = "^3.0.3"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.0"

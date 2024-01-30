@@ -26,6 +26,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/user_code.Dockerfile
+      target: production
     container_name: {{cookiecutter.project_slug}}_user_code
     image: {{cookiecutter.project_slug}}_user_code_image
     restart: always
@@ -33,8 +34,6 @@ services:
       - ./.envs/.production
     environment:
       DAGSTER_CURRENT_IMAGE: "{{cookiecutter.project_slug}}_user_code_image"
-    volumes:
-      - ./{{cookiecutter.project_slug}}:/opt/dagster/app:z
     networks:
       - {{cookiecutter.project_slug}}_network
 

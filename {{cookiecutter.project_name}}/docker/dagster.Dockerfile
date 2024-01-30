@@ -6,7 +6,7 @@ FROM python:3.11-slim as base
 WORKDIR /opt/dagster
 
 # Copy the requirements file and install Python dependencies
-COPY ./requirements/dagster.txt /opt/dagster/requirements.txt
+COPY ./docker/dagster-requirements.txt /opt/dagster/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set $DAGSTER_HOME and copy dagster instance and workspace YAML there

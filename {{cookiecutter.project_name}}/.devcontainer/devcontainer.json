@@ -7,7 +7,7 @@
 	],
 	"init": true,
 	"service": "{{cookiecutter.project_slug}}_local_user_code",
-	"workspaceFolder": "/opt/dagster/app",
+	"workspaceFolder": "/app",
 	"customizations": {
 		"vscode": {
 			"extensions": [
