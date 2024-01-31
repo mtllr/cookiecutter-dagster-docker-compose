@@ -98,6 +98,11 @@ CMD ["dagster", "code-server", "start", "-h", "0.0.0.0", "-p", "4000", "-m", "{{
 ################################
 FROM python-base as production
 
+# Create a container user so that we don't run as root in production
+ARG CONTAINER_USER=dagster
+RUN addgroup --system $CONTAINER_USER \
+    && adduser --system --ingroup $CONTAINER_USER $CONTAINER_USER
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates && \
@@ -109,9 +114,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 COPY --from=builder-base $VIRTUAL_ENV $VIRTUAL_ENV
 
 WORKDIR /app
+ARG HOME_DIR=/app
 
 # Copy the repository code
-COPY ./{{cookiecutter.project_slug}} ./{{cookiecutter.project_slug}}
+COPY --chown=$CONTAINER_USER:$CONTAINER_USER ./{{cookiecutter.project_slug}} ./{{cookiecutter.project_slug}}
+
+# Make dagster user owner of the WORKDIR directory as well.
+RUN chown $CONTAINER_USER:$CONTAINER_USER ${HOME_DIR}
+# Switch to dagster user
+USER $CONTAINER_USER
 
 EXPOSE 4000
 CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-m", "{{cookiecutter.project_slug}}"]

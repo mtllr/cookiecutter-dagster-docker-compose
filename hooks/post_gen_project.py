@@ -36,7 +36,7 @@ def append_to_gitignore_file(ignored_line):
 append_to_gitignore_file(".env")
 append_to_gitignore_file(".envs/*")
 if "{{ cookiecutter.keep_local_envs_in_vcs }}".lower() == "y":
-    append_to_gitignore_file("!.envs/.local/")
+    append_to_gitignore_file("!.envs/.local")
 
 
 def generate_random_user():
