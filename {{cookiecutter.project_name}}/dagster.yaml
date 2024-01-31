@@ -21,6 +21,12 @@ run_launcher:
       volumes: # Make docker client accessible to any launched containers as well
         - /var/run/docker.sock:/var/run/docker.sock
         - /tmp/io_manager_storage:/tmp/io_manager_storage
+        # For hot realoading of code to work 
+        # Need to mount user code (and data path if required separately) rather than project root for some reason. e.g. 
+        # e.g. mount the code path as follows to so that run launcher can access the code changes:
+        # - /absolute/path/to/project/project_slug:/app/project_slug
+        # optional mount any data path e.g:
+        # - /absolute/path/to/project/data:/app/data
 
 run_storage:
   module: dagster_postgres.run_storage
