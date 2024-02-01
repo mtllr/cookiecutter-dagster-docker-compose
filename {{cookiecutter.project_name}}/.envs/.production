@@ -1,0 +1,8 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+DOCKER_NETWORK={{ cookiecutter.project_slug }}_network
+POSTGRES_HOST={{ cookiecutter.project_slug }}_postgres
+POSTGRES_PORT=5432
+POSTGRES_DB={{ cookiecutter.project_slug }}
+POSTGRES_USER=!!!SET POSTGRES_USER!!!
+POSTGRES_PASSWORD=!!!SET POSTGRES_PASSWORD!!!

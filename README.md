@@ -14,8 +14,9 @@ fill in the project_name.
 
 Choose the libraries that you need to work on you dagster project by changing the requirements.txt files in the user code project and the dagster project.
 
+
 ```bash
-docker-compose up
+docker compose up
 ```
 
 open http://localhost:3000
